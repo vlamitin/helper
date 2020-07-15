@@ -1,0 +1,7 @@
+*.swp
+.idea
+
+venv/
+__pycache__
+
+settings_user.py
