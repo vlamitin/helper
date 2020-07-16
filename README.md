@@ -12,10 +12,10 @@ scripts to ease work with github, jira, jenkins
 - [get github token](https://github.com/settings/tokens) (with scope 'repo')
 
 ## install
-- `make install` - installs virtualenv and all dependencies (locally)
 - `cp settings_global.py settings_user.py`
 - fill settings_user.py
+- `make install` - installs virtualenv and all dependencies (locally), creates /home/$USER/bin/helper script
 
 ## usage
-- `source login.sh` 
-- `python3 -m create_pr <branch-name> --reviewers user1 user2`
+- `source login.sh` (once per terminal session, to set tokens)
+- `helper -h`

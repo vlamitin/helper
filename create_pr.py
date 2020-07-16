@@ -19,7 +19,7 @@ from internal.repo_content import get_file_content
 def get_new_pr_props_by_head_branch_name(
         gh_login, gh_token, repo_org, repo_name,
         jira_domain, jira_login, jira_token,
-        head_branch_name, title_content_list
+        head_branch_name, title_content
 ):
     labels = settings.to_pr_labels(head_branch_name)
     task_keys = settings.to_jira_task_keys(head_branch_name)
@@ -31,7 +31,7 @@ def get_new_pr_props_by_head_branch_name(
     )
 
     title = settings.to_pr_title(jira_tasks,
-                                 title_content_list and len(title_content_list) == 1 and title_content_list[0] or '',
+                                 title_content,
                                  brief_milestone)
 
     jira_links_comment = '\n'.join(
@@ -53,13 +53,23 @@ def get_new_pr_props_by_head_branch_name(
     }
 
 
-def run_scenario():
-    arg_parser = argparse.ArgumentParser(description='Create pr from given head branch name')
+def add_arguments(arg_parser):
     arg_parser.add_argument('head_branch', nargs=1, type=str, help='head branch name')
     arg_parser.add_argument('--reviewers', nargs='*', type=str, help='space delimited list of reviewers')
     arg_parser.add_argument('--title_content', nargs=1, type=str, help='pr title (between jira task keys and version)')
-    args = arg_parser.parse_args()
 
+    return arg_parser
+
+
+def parse_args(args_dict):
+    return {
+        'head_branch': args_dict['head_branch'],
+        'reviewers': args_dict['reviewers'] or [],
+        'title_content': args_dict['title_content'] and args_dict['title_content'][0] or '',
+    }
+
+
+def run_scenario(head_branch, reviewers, title_content):
     print("script: setting creds from envs ...")
     try:
         GH_LOGIN = os.environ['PR_HELPER_GH_LOGIN']
@@ -71,10 +81,6 @@ def run_scenario():
         print("script: (!) no envs set, exiting")
         quit(0)
 
-    head_branch = vars(args)['head_branch'][0]
-    reviewers = vars(args)['reviewers']
-    title_content_list = vars(args)['title_content']
-
     for reviewer in reviewers:
         if not (check_collaborator(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME, reviewer)):
             print(f"script: (!) {reviewer} is not a collaborator")
@@ -85,17 +91,17 @@ def run_scenario():
         quit(0)
 
     print("script: fetching branch new pr summary...")
-    new_pr_summmary = get_new_pr_props_by_head_branch_name(
+    new_pr_summary = get_new_pr_props_by_head_branch_name(
         GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME,
         JIRA_DOMAIN, JIRA_LOGIN, JIRA_TOKEN,
-        head_branch, title_content_list
+        head_branch, title_content
     )
 
-    pprint(new_pr_summmary, width=140, indent=2)
+    pprint(new_pr_summary, width=140, indent=2)
 
     if not check_branch_exists(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME,
-                               new_pr_summmary['base_branch_name']):
-        print(f"script: (!) base branch \"{new_pr_summmary['base_branch_name']}\" does not exist on remote")
+                               new_pr_summary['base_branch_name']):
+        print(f"script: (!) base branch \"{new_pr_summary['base_branch_name']}\" does not exist on remote")
         quit(0)
 
     continue_choice = input(
@@ -104,21 +110,22 @@ def run_scenario():
     if continue_choice in ["n", "N"]:
         quit(0)
 
-    pr_body_template = get_file_content(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME, 'PULL_REQUEST_TEMPLATE.md')
+    pr_body_template = get_file_content(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME,
+                                        'PULL_REQUEST_TEMPLATE.md')
     pr_body = pr_body_template.replace(
         f"[Ссылка на задачу]({settings.JIRA_DOMAIN}/browse/)",
-        new_pr_summmary['jira_links_comment'],
+        new_pr_summary['jira_links_comment'],
     )
 
     print("script: creating pr ...")
     created_pr = create_pr(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME,
-                           new_pr_summmary['title'], pr_body,
-                           new_pr_summmary['head_branch_name'], new_pr_summmary['base_branch_name'])
+                           new_pr_summary['title'], pr_body,
+                           new_pr_summary['head_branch_name'], new_pr_summary['base_branch_name'])
     print(f"script: created pr https://github.com/{settings.REPO_ORG}/{settings.REPO_NAME}/pull/{created_pr['number']}")
 
     print("script: setting milestone and labels ...")
     update_pr(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME,
-                           created_pr['number'], new_pr_summmary['milestone_number'], new_pr_summmary['labels'])
+              created_pr['number'], new_pr_summary['milestone_number'], new_pr_summary['labels'])
     print("script: successfully updated pr with milestone and labels")
 
     if reviewers and len(reviewers) > 0:
@@ -147,7 +154,10 @@ def run_scenario():
 
 if __name__ == '__main__':
     try:
-        run_scenario()
+        arg_parser = argparse.ArgumentParser(description='Create pr from given head branch name')
+        arg_parser = add_arguments(arg_parser)
+        arguments_dict = parse_args(vars(arg_parser.parse_args()))
+        run_scenario(arguments_dict['head_branch'], arguments_dict['reviewers'], arguments_dict['title_content'])
     except KeyboardInterrupt:
         print(f"\nscript: KeyboardInterrupt, exiting ...")
         quit(0)

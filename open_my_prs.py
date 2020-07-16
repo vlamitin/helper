@@ -7,9 +7,6 @@ from internal.pr import get_user_created_prs, get_user_request_reviews
 
 
 def run_scenario():
-    arg_parser = argparse.ArgumentParser(description='Opens your created and your review requested prs')
-    arg_parser.parse_args()
-
     print("script: setting creds from envs ...")
     try:
         GH_LOGIN = os.environ['PR_HELPER_GH_LOGIN']
@@ -38,6 +35,8 @@ def run_scenario():
 
 if __name__ == '__main__':
     try:
+        arg_parser = argparse.ArgumentParser(description='Opens your created and your review requested prs')
+        arg_parser.parse_args()
         run_scenario()
     except KeyboardInterrupt:
         print(f"\nscript: KeyboardInterrupt, exiting ...")
