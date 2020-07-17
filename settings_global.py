@@ -5,6 +5,8 @@ REPO_NAME = 'markup'
 
 JIRA_DOMAIN = 'https://atlassian.atlassian.net'
 
+LOCAL_PROJECT_PATH = '/home/user/projects/markup'
+
 
 def to_milestone_title(branch_name):
     to_version_re = re.compile(r"to[-|_]?(\d\d\.\d[\d]?)")
@@ -67,3 +69,11 @@ all_build_contexts = [
 
 def to_build_trigger_comment(builds):
     return '\n'.join(list(set([x['build_context'] for x in builds])))
+
+
+def filter_prs_to_update(prs):
+    return prs
+
+
+def filter_prs_to_merge_local(prs):
+    return prs

@@ -105,7 +105,7 @@ def run_scenario(head_branch, reviewers, title_content):
         quit(0)
 
     continue_choice = input(
-        "script: PR with this ^ props will be created, press \"Enter\" or to continue, \"n\" to quit ..."
+        "script: PR with this ^ props will be created, press \"Enter\" to continue, \"n\" to quit ..."
     )
     if continue_choice in ["n", "N"]:
         quit(0)
@@ -154,9 +154,8 @@ def run_scenario(head_branch, reviewers, title_content):
 
 if __name__ == '__main__':
     try:
-        arg_parser = argparse.ArgumentParser(description='Create pr from given head branch name')
-        arg_parser = add_arguments(arg_parser)
-        arguments_dict = parse_args(vars(arg_parser.parse_args()))
+        ap = add_arguments(argparse.ArgumentParser(description='Create pr from given head branch name'))
+        arguments_dict = parse_args(vars(ap.parse_args()))
         run_scenario(arguments_dict['head_branch'], arguments_dict['reviewers'], arguments_dict['title_content'])
     except KeyboardInterrupt:
         print(f"\nscript: KeyboardInterrupt, exiting ...")

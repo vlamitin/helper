@@ -13,6 +13,10 @@ JIRA_DOMAIN = hasattr(settings_user, 'JIRA_DOMAIN') \
                      and settings_user.JIRA_DOMAIN \
                      or settings_global.JIRA_DOMAIN
 
+LOCAL_PROJECT_PATH = hasattr(settings_user, 'LOCAL_PROJECT_PATH') \
+                     and settings_user.LOCAL_PROJECT_PATH \
+                     or settings_global.LOCAL_PROJECT_PATH
+
 
 def to_milestone_title(branch_name):
     if hasattr(settings_user, 'to_milestone_title'):
@@ -66,3 +70,17 @@ def to_build_trigger_comment(builds):
         return settings_user.to_build_trigger_comment(builds)
 
     return settings_global.to_build_trigger_comment(builds)
+
+
+def filter_prs_to_update(prs):
+    if hasattr(settings_user, 'filter_prs_to_update'):
+        return settings_user.filter_prs_to_update(prs)
+
+    return settings_global.filter_prs_to_update(prs)
+
+
+def filter_prs_to_merge_local(prs):
+    if hasattr(settings_user, 'filter_prs_to_merge_local'):
+        return settings_user.filter_prs_to_merge_local(prs)
+
+    return settings_global.filter_prs_to_merge_local(prs)

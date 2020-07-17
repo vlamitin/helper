@@ -18,6 +18,25 @@ def list_prs(gh_login, gh_token, repo_org, repo_name, base):
     return res.json()
 
 
+def list_open_prs(gh_login, gh_token, repo_org, repo_name):
+    res = requests.get(
+        f"https://api.github.com/repos/{repo_org}/{repo_name}/pulls",
+        params={'per_page': 100},
+        auth=HTTPBasicAuth(gh_login, gh_token),
+        headers={'Accept': 'application/vnd.github.v3+json'}
+    )
+    return res.json()
+
+
+# def list_open_prs(gh_login, gh_token, repo_org, repo_name):
+#     res = requests.get(
+#         f"https://api.github.com/search/issues?q=is:open%20is:pr%20repo:{repo_org}/{repo_name}&per_page=100",
+#         auth=HTTPBasicAuth(gh_login, gh_token),
+#         headers={'Accept': 'application/vnd.github.v3+json'}
+#     )
+#     return res.json()['items']
+
+
 # https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests#search-within-a-users-or-organizations-repositories
 def get_user_created_prs(gh_login, gh_token,
                          username):
@@ -43,7 +62,7 @@ def get_pr_summary(gh_login, gh_token, repo_org, repo_name, pr_number):
     pr = _get_pr(gh_login, gh_token, repo_org, repo_name, pr_number)
 
     return {
-        **_to_brief_pr(pr),
+        **to_brief_pr(pr),
         'blocking_builds': get_blocking_builds(
             list_pr_build_statuses(gh_login, gh_token, pr['statuses_url'])
         ),
@@ -89,7 +108,7 @@ def _get_pr(gh_login, gh_token, repo_org, repo_name, pr_number):
     return res.json()
 
 
-def _to_brief_pr(pr):
+def to_brief_pr(pr):
     return {
         'user_login': pr['user']['login'],
         'title': pr['title'],
@@ -101,15 +120,12 @@ def _to_brief_pr(pr):
             'state': pr['milestone']['state'],
             'title': pr['milestone']['title']
         },
-        'mergeable': pr['mergeable'],
         'locked': pr['locked'],
         'labels': pr['labels'] and [lbl['name'] for lbl in pr['labels']],
         'head_ref': pr['head']['ref'],
         'base': pr['base']['ref'],
-        'commits': pr['commits'],
-        'changed_files': pr['changed_files'],
-        'additions': pr['additions'],
-        'deletions': pr['deletions'],
+        'comments_url': pr['comments_url'],
+        'commits_url': pr['commits_url'],
         'created_at': pr['created_at'],
     }
 
