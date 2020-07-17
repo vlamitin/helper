@@ -5,6 +5,8 @@ from webbrowser import open_new_tab
 
 from internal.pr import get_user_created_prs, get_user_request_reviews
 
+DESCRIPTION = "Opens your created and your review requested prs"
+
 
 def run_scenario():
     print("script: setting creds from envs ...")
@@ -35,7 +37,7 @@ def run_scenario():
 
 if __name__ == '__main__':
     try:
-        arg_parser = argparse.ArgumentParser(description='Opens your created and your review requested prs')
+        arg_parser = argparse.ArgumentParser(description=DESCRIPTION)
         arg_parser.parse_args()
         run_scenario()
     except KeyboardInterrupt:

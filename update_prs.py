@@ -6,6 +6,9 @@ import settings
 from internal.pr import list_open_prs
 
 
+DESCRIPTION = "Merges base branch in each prs head branch"
+
+
 def add_arguments(arg_parser):
     arg_parser.add_argument('base_branch', nargs=1, type=str, help='base branch name')
 
@@ -88,7 +91,7 @@ def run_scenario(base_branch_name):
 
 if __name__ == '__main__':
     try:
-        ap = add_arguments(argparse.ArgumentParser(description='Create pr from given head branch name'))
+        ap = add_arguments(argparse.ArgumentParser(description=DESCRIPTION))
         arguments_dict = parse_args(vars(ap.parse_args()))
         run_scenario(arguments_dict['base_branch'])
     except KeyboardInterrupt:

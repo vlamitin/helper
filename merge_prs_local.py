@@ -5,6 +5,8 @@ from pprint import pprint
 import settings
 from internal.pr import list_open_prs
 
+DESCRIPTION = "Creates local merge branch"
+
 
 def add_arguments(arg_parser):
     arg_parser.add_argument('merge_branch_name', nargs=1, type=str, help='base branch name')
@@ -58,7 +60,7 @@ def run_scenario(merge_branch_name):
 
 if __name__ == '__main__':
     try:
-        ap = add_arguments(argparse.ArgumentParser(description='Create new branch and merge'))
+        ap = add_arguments(argparse.ArgumentParser(description=DESCRIPTION))
         arguments_dict = parse_args(vars(ap.parse_args()))
         run_scenario(arguments_dict['merge_branch_name'])
     except KeyboardInterrupt:

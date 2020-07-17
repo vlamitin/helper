@@ -1,10 +1,11 @@
 import json
+import math
 
 import requests
 import os
 from pprint import pprint
 from requests.auth import HTTPBasicAuth
-from datetime import timedelta, datetime
+from datetime import datetime
 
 
 # https://docs.atlassian.com/software/jira/docs/api/REST/7.3.3/#api/2/issue
@@ -48,19 +49,57 @@ def to_worklogs_dict(worklogs):
 
     for item in worklogs:
         if item['author']['displayName'] in result_dict:
-            result_dict[item['author']['displayName']] += item['timeSpentSeconds']
+            result_dict[item['author']['displayName']]['timeSpentSeconds'] += item['timeSpentSeconds']
+            result_dict[item['author']['displayName']]['timeSpent_h']\
+                = to_human_readable_jira_period(result_dict[item['author']['displayName']]['timeSpentSeconds'])
         else:
-            result_dict[item['author']['displayName']] = item['timeSpentSeconds']
+            result_dict[item['author']['displayName']] = {
+                'timeSpentSeconds': item['timeSpentSeconds'],
+                'timeSpent_h': to_human_readable_jira_period(item['timeSpentSeconds']),
+            }
 
-    return dict(
-        [
-            (
-                x,
-                str(timedelta(seconds=result_dict[x]))
-            )
-            for x in result_dict
-        ]
-    )
+    return result_dict
+
+
+def to_human_readable_jira_period(jira_seconds):
+    if not jira_seconds:
+        return "0s"
+
+    result = ""
+
+    minute_in_seconds = 60
+    hour_in_seconds = minute_in_seconds * 60
+    day_in_seconds = hour_in_seconds * 8  # work day
+
+    days = 0
+    hours = 0
+    minutes = 0
+
+    days += math.floor(jira_seconds / day_in_seconds)
+    jira_seconds -= days * day_in_seconds
+    if days:
+        result += f"{days}d"
+
+    hours += math.floor(jira_seconds / hour_in_seconds)
+    jira_seconds -= hours * hour_in_seconds
+    if hours:
+        if result:
+            result += " "
+        result += f"{hours}h"
+
+    minutes += math.floor(jira_seconds / minute_in_seconds)
+    jira_seconds -= minutes * minute_in_seconds
+    if minutes:
+        if result:
+            result += " "
+        result += f"{minutes}m"
+
+    if jira_seconds:
+        if result:
+            result += " "
+        result += f"{jira_seconds}s"
+
+    return result
 
 
 if __name__ == '__main__':
@@ -74,3 +113,6 @@ if __name__ == '__main__':
         quit(0)
 
     pprint("TODO debug")
+    print("676800", to_human_readable_jira_period(676800))
+    print("14400 (4h)", to_human_readable_jira_period(14400))
+    print("115200 (4d)", to_human_readable_jira_period(115200))

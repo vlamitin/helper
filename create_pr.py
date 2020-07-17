@@ -15,6 +15,8 @@ from internal.pr_reviews import request_pr_reviews
 from internal.repo import check_collaborator
 from internal.repo_content import get_file_content
 
+DESCRIPTION = 'Creates pr from given head branch name'
+
 
 def get_new_pr_props_by_head_branch_name(
         gh_login, gh_token, repo_org, repo_name,
@@ -63,13 +65,14 @@ def add_arguments(arg_parser):
 
 def parse_args(args_dict):
     return {
-        'head_branch': args_dict['head_branch'],
+        'head_branch': args_dict['head_branch'][0],
         'reviewers': args_dict['reviewers'] or [],
         'title_content': args_dict['title_content'] and args_dict['title_content'][0] or '',
     }
 
 
 def run_scenario(head_branch, reviewers, title_content):
+    print(head_branch)
     print("script: setting creds from envs ...")
     try:
         GH_LOGIN = os.environ['PR_HELPER_GH_LOGIN']
@@ -154,7 +157,7 @@ def run_scenario(head_branch, reviewers, title_content):
 
 if __name__ == '__main__':
     try:
-        ap = add_arguments(argparse.ArgumentParser(description='Create pr from given head branch name'))
+        ap = add_arguments(argparse.ArgumentParser(description=DESCRIPTION))
         arguments_dict = parse_args(vars(ap.parse_args()))
         run_scenario(arguments_dict['head_branch'], arguments_dict['reviewers'], arguments_dict['title_content'])
     except KeyboardInterrupt:
