@@ -6,6 +6,7 @@ scripts to ease work with github, jira, jenkins
 ## Features
 - create PR with all that milestones, labels, title, body, links to jira, reviewers, etc from command line
 - open all review requested PRs in browser
+- open all your jira tasks in browser
 - list jira tasks tree with brief info
 - update all outdated prs at once
 - merge all your prs at local branch

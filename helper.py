@@ -1,5 +1,6 @@
 import argparse
 
+import open_jira_tasks
 import print_jira_tree
 import merge_prs_local
 import create_pr
@@ -8,13 +9,14 @@ import update_prs
 
 
 def run_scenario():
-    arg_parser = argparse.ArgumentParser(prog="helper")
+    arg_parser = argparse.ArgumentParser(prog="helper", description="Type helper {command} -h for each command help")
     subparsers = arg_parser.add_subparsers(title="commands", dest="command")
 
     create_pr_parser = subparsers.add_parser('create_pr', help=create_pr.DESCRIPTION)
     create_pr.add_arguments(create_pr_parser)
 
     open_prs_parser = subparsers.add_parser('open_prs', help=open_prs.DESCRIPTION)
+    open_jira_tasks_parser = subparsers.add_parser('open_jira_tasks', help=open_jira_tasks.DESCRIPTION)
 
     merge_prs_local_parser = subparsers.add_parser('merge_prs_local', help=merge_prs_local.DESCRIPTION)
     merge_prs_local.add_arguments(merge_prs_local_parser)
@@ -35,6 +37,8 @@ def run_scenario():
         )
     elif args_dict['command'] == 'open_prs':
         open_prs.run_scenario()
+    elif args_dict['command'] == 'open_jira_tasks':
+        open_jira_tasks.run_scenario()
     elif args_dict['command'] == 'merge_prs_local':
         arguments_dict = merge_prs_local.parse_args(args_dict)
         merge_prs_local.run_scenario(arguments_dict['merge_branch_name'])
@@ -44,6 +48,8 @@ def run_scenario():
     elif args_dict['command'] == 'update_prs':
         arguments_dict = update_prs.parse_args(args_dict)
         update_prs.run_scenario(arguments_dict['base_branch'])
+    else:
+        arg_parser.print_usage()
 
 
 if __name__ == '__main__':

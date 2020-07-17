@@ -32,6 +32,14 @@ def get_tasks_for_epic(jira_domain, jira_login, jira_token, epic_key):
     return res.json()['issues']
 
 
+def get_my_tasks(jira_domain, jira_login, jira_token):
+    res = requests.get(
+        f"{jira_domain}/rest/api/2/search?jql=assignee%20%3D%20currentUser()%20AND%20Status%20NOT%20IN%20(DONE%2C%20CLOSED%2C%20RESOLVED)%20ORDER%20BY%20priority%20DESC",
+        auth=HTTPBasicAuth(jira_login, jira_token),
+    )
+    return res.json()['issues']
+
+
 def _to_brief_jira_task(jira_task):
     return {
         'key': jira_task['key'],
