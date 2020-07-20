@@ -32,11 +32,53 @@ def to_version(branch_name):
     return settings_global.to_version(branch_name)
 
 
+def to_new_version_branch_name(branch_name, version):
+    if hasattr(settings_user, 'to_new_version_branch_name'):
+        return settings_user.to_new_version_branch_name(branch_name, version)
+
+    return settings_global.to_new_version_branch_name(branch_name, version)
+
+
 def to_release_branch_name(version):
     if hasattr(settings_user, 'to_release_branch_name'):
         return settings_user.to_release_branch_name(version)
 
     return settings_global.to_release_branch_name(version)
+
+
+def to_release_tag(version):
+    if hasattr(settings_user, 'to_release_tag'):
+        return settings_user.to_release_tag(version)
+
+    return settings_global.to_release_tag(version)
+
+
+def tag_to_version(release_tag):
+    if hasattr(settings_user, 'tag_to_version'):
+        return settings_user.tag_to_version(release_tag)
+
+    return settings_global.tag_to_version(release_tag)
+
+
+def next_patch(version):
+    if hasattr(settings_user, 'next_patch'):
+        return settings_user.next_patch(version)
+
+    return settings_global.next_patch(version)
+
+
+def next_minor(version):
+    if hasattr(settings_user, 'next_minor'):
+        return settings_user.next_minor(version)
+
+    return settings_global.next_minor(version)
+
+
+def to_version_sort_key(version):
+    if hasattr(settings_user, 'to_version_sort_key'):
+        return settings_user.to_version_sort_key(version)
+
+    return settings_global.to_version_sort_key(version)
 
 
 def to_jira_task_keys(branch_name):

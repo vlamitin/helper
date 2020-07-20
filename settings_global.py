@@ -26,8 +26,34 @@ def to_version(branch_name):
     return None
 
 
+def to_new_version_branch_name(branch_name, version):
+    return re.sub(r"to[-|_]?(\d\d\.\d[\d]?)", f"to-{'.'.join(version.split('.')[2:])}", branch_name)
+
+
 def to_release_branch_name(version):
     return 'release_' + version
+
+
+def to_release_tag(version):
+    return 'v' + version
+
+
+def tag_to_version(release_tag):
+    return release_tag[1:]
+
+
+def next_patch(version):
+    version_parts = version.split('.')
+    return '.'.join(version_parts[:-1]) + f".{int(version_parts[-1]) + 1}"
+
+
+def next_minor(version):
+    version_parts = version.split('.')
+    return '.'.join(version_parts[:-2]) + f".{int(version_parts[-2]) + 1}.0"
+
+
+def to_version_sort_key(version):
+    return sum([int(x) * 10 ** (i + 1) for i, x in enumerate(reversed(version.split('.')))])
 
 
 def to_jira_task_keys(branch_name):

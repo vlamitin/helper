@@ -40,7 +40,7 @@ def get_my_tasks(jira_domain, jira_login, jira_token):
     return res.json()['issues']
 
 
-def _to_brief_jira_task(jira_task):
+def to_brief_jira_task(jira_task):
     return {
         'key': jira_task['key'],
         'summary': jira_task['fields']['summary'],
@@ -79,7 +79,7 @@ def get_brief_tasks_tree(jira_domain, jira_login, jira_token, root_task):
         'children': children,
         'sum_estimate': sum_estimate,
         'sum_estimate_h': to_human_readable_jira_period(sum_estimate),
-        **_to_brief_jira_task(root_task)
+        **to_brief_jira_task(root_task)
     }
 
 

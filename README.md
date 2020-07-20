@@ -22,8 +22,8 @@ scripts to ease work with github, jira, jenkins
 ## install
 - `cp settings_global.py settings_user.py`
 - fill settings_user.py
-- `make install` - installs virtualenv and all dependencies (locally), creates /home/$USER/bin/helper script
+- `make install` - installs virtualenv and all dependencies (locally), creates /home/$USER/bin/helper script and /home/$USER/bin/helper_login
 
 ## usage
-- `source login.sh` (once per terminal session, to set tokens)
+- `source helper_login` (once per terminal session, to set tokens)
 - `helper -h`

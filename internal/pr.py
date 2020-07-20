@@ -27,7 +27,7 @@ def list_open_prs(gh_login, gh_token, repo_org, repo_name):
     )
     return res.json()
 
-
+# returns some kind of short version of pr-s
 # def list_open_prs(gh_login, gh_token, repo_org, repo_name):
 #     res = requests.get(
 #         f"https://api.github.com/search/issues?q=is:open%20is:pr%20repo:{repo_org}/{repo_name}&per_page=100",

@@ -52,6 +52,11 @@ def run_scenario():
     else:
         arg_parser.print_usage()
 
+    # TODO
+    # worklog adder
+    # check nearest minor version
+    # check if code freeze
+
 
 if __name__ == '__main__':
     try:
