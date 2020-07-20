@@ -16,6 +16,7 @@ def run_scenario():
     create_pr.add_arguments(create_pr_parser)
 
     open_prs_parser = subparsers.add_parser('open_prs', help=open_prs.DESCRIPTION)
+
     open_jira_tasks_parser = subparsers.add_parser('open_jira_tasks', help=open_jira_tasks.DESCRIPTION)
 
     merge_prs_local_parser = subparsers.add_parser('merge_prs_local', help=merge_prs_local.DESCRIPTION)

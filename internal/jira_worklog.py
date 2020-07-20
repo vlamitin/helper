@@ -17,6 +17,22 @@ def get_worklogs(jira_domain, jira_login, jira_token, task_key):
     return res.json()['worklogs']
 
 
+def add_worklog(jira_domain, jira_login, jira_token, task_key, time_spent_seconds):
+    res = requests.post(
+        f"{jira_domain}/rest/api/3/issue/{task_key}/worklog",
+        auth=HTTPBasicAuth(jira_login, jira_token),
+        headers={
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        data=json.dumps({
+            'started': datetime.now().strftime('%Y-%m-%dT%H:%M:%S') + '.094+0300',
+            'timeSpentSeconds': time_spent_seconds
+        })
+    )
+    return res.json()
+
+
 # does not work
 # https://stackoverflow.com/questions/12776109/how-to-get-all-work-logs-for-a-period-of-time-from-the-jira-rest-api
 # since in dd.mm.yyyy format
@@ -113,6 +129,6 @@ if __name__ == '__main__':
         quit(0)
 
     pprint("TODO debug")
-    print("676800", to_human_readable_jira_period(676800))
-    print("14400 (4h)", to_human_readable_jira_period(14400))
-    print("115200 (4d)", to_human_readable_jira_period(115200))
+    # print("676800", to_human_readable_jira_period(676800))
+    # print("14400 (4h)", to_human_readable_jira_period(14400))
+    # print("115200 (4d)", to_human_readable_jira_period(115200))
