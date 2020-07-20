@@ -108,9 +108,9 @@ def run_scenario(head_branch, reviewers, title_content):
         quit(0)
 
     continue_choice = input(
-        "script: PR with this ^ props will be created, press \"Enter\" to continue, \"n\" to quit ..."
+        "script: PR with this ^ props will be created, press \"Enter\" to continue, \"q\" to quit ..."
     )
-    if continue_choice in ["n", "N"]:
+    if continue_choice in ["q", "Q"]:
         quit(0)
 
     pr_body_template = get_file_content(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME,

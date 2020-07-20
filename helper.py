@@ -1,5 +1,6 @@
 import argparse
 
+import cherry
 import open_jira_tasks
 import print_jira_tree
 import merge_prs_local
@@ -28,6 +29,9 @@ def run_scenario():
     print_jira_tree_parser = subparsers.add_parser('print_jira_tree', help=print_jira_tree.DESCRIPTION)
     print_jira_tree.add_arguments(print_jira_tree_parser)
 
+    cherry_parser = subparsers.add_parser('cherry', help=cherry.DESCRIPTION)
+    cherry.add_arguments(cherry_parser)
+
     args = arg_parser.parse_args()
     args_dict = vars(args)
 
@@ -49,6 +53,9 @@ def run_scenario():
     elif args_dict['command'] == 'update_prs':
         arguments_dict = update_prs.parse_args(args_dict)
         update_prs.run_scenario(arguments_dict['base_branch'])
+    elif args_dict['command'] == 'cherry':
+        arguments_dict = cherry.parse_args(args_dict)
+        cherry.run_scenario(arguments_dict['commits_count'])
     else:
         arg_parser.print_usage()
 

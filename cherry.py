@@ -39,13 +39,11 @@ def run_scenario(commits_count):
         f"git -C {settings.LOCAL_PROJECT_PATH} log -{abs(commits_count)} --pretty=format:'%H'", shell=True
     )
     commit_hashes = git_log_output.decode('utf-8').split("\n")
-    print(commit_hashes)
 
     git_current_branch_name_output = subprocess.check_output(
         f"git -C {settings.LOCAL_PROJECT_PATH} rev-parse --abbrev-ref HEAD", shell=True
     )
     current_branch_name = git_current_branch_name_output.decode('utf-8').split("\n")[0]
-    print(current_branch_name)
 
     task_keys = settings.to_jira_task_keys(current_branch_name)
     jira_tasks = [get_jira_task(JIRA_DOMAIN, JIRA_LOGIN, JIRA_TOKEN, x) for x in task_keys]
@@ -58,9 +56,9 @@ def run_scenario(commits_count):
               f"and fixVersions {brief_jt['fixVersions']} => to releases: {[x[1] for x in base_branches]}")
 
     continue_choice = input(
-        "script: PRs with this ^ props will be created, press \"Enter\" to continue, \"n\" to quit ..."
+        "script: PRs with this ^ props will be created, press \"Enter\" to continue, \"q\" to quit ..."
     )
-    if continue_choice in ["n", "N"]:
+    if continue_choice in ["q", "Q"]:
         quit(0)
 
     project_path = settings.LOCAL_PROJECT_PATH
@@ -71,9 +69,9 @@ def run_scenario(commits_count):
         if check_branch_exists(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME, new_branch_name):
             continue_choice = input(
                 f"script: (!) branch {new_branch_name} " +
-                f"already exists in remote; press \"Enter\" to skip this branch, \"n\" to quit ..."
+                f"already exists in remote; press \"Enter\" to skip this branch, \"q\" to quit ..."
             )
-            if continue_choice in ["n", "N"]:
+            if continue_choice in ["q", "Q"]:
                 quit(0)
             else:
                 continue
@@ -107,6 +105,7 @@ def run_scenario(commits_count):
 
 
 def get_base_brahches(gh_login, gh_token, jira_tasks):
+    print("script: calculating base branches ...")
     branches_dict = dict([(x['key'], []) for x in jira_tasks])
 
     for jira_task in [to_brief_jira_task(x) for x in jira_tasks]:
@@ -152,8 +151,8 @@ def get_base_brahches(gh_login, gh_token, jira_tasks):
         for release_version, release_branch in branches_dict[jira_task['key']]:
             prs = list_prs(gh_login, gh_token, settings.REPO_ORG, settings.REPO_NAME, release_branch)
             for pr in prs:
-                if jira_task['key'].lower() in pr['head']['ref']:
-                    print(f"script: {jira_task['key']} already has PR to {pr['head']['ref']} ...")
+                if jira_task['key'].lower() in pr['head']['ref'].lower():
+                    print(f"script: (!) {jira_task['key']} already has PR to {pr['head']['ref']}, skipping ...")
                     branches_dict[jira_task['key']].remove((release_version, release_branch))
 
     if len(set(
