@@ -10,6 +10,8 @@ scripts to ease work with github, jira, jenkins
 - list jira tasks tree with brief info
 - update all outdated prs at once
 - merge all your prs at local branch
+- create worklog from console
+- cherry-pick commits to another PRs
 
 ## Prerequisites
 - linux

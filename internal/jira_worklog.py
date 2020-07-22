@@ -1,5 +1,6 @@
 import json
 import math
+import re
 
 import requests
 import os
@@ -118,6 +119,25 @@ def to_human_readable_jira_period(jira_seconds):
     return result
 
 
+def to_jira_seconds(jira_period_pieces):
+    result = 0
+
+    minute_in_seconds = 60
+    hour_in_seconds = minute_in_seconds * 60
+    day_in_seconds = hour_in_seconds * 8  # work day
+
+    for period_piece in jira_period_pieces:
+        value = int(re.compile(r"(\d+)").match(period_piece).group())
+        if "d" in period_piece:
+            result += value * day_in_seconds
+        elif "h" in period_piece:
+            result += value * hour_in_seconds
+        elif "m" in period_piece:
+            result += value * minute_in_seconds
+
+    return result
+
+
 if __name__ == '__main__':
     print("script: setting creds from envs ...")
     try:
@@ -132,3 +152,5 @@ if __name__ == '__main__':
     # print("676800", to_human_readable_jira_period(676800))
     # print("14400 (4h)", to_human_readable_jira_period(14400))
     # print("115200 (4d)", to_human_readable_jira_period(115200))
+    # print("23d 4h (676800)", to_jira_seconds(["23d", "4h"]))
+    # print("4d (115200)", to_jira_seconds(["4d"]))

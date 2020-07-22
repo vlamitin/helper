@@ -7,6 +7,7 @@ import merge_prs_local
 import create_pr
 import open_prs
 import update_prs
+import worklog
 
 
 def run_scenario():
@@ -31,6 +32,9 @@ def run_scenario():
 
     cherry_parser = subparsers.add_parser('cherry', help=cherry.DESCRIPTION)
     cherry.add_arguments(cherry_parser)
+
+    worklog_parser = subparsers.add_parser('worklog', help=worklog.DESCRIPTION)
+    worklog.add_arguments(worklog_parser)
 
     args = arg_parser.parse_args()
     args_dict = vars(args)
@@ -59,11 +63,16 @@ def run_scenario():
     elif args_dict['command'] == 'cherry':
         arguments_dict = cherry.parse_args(args_dict)
         cherry.run_scenario(arguments_dict['commits_count_or_jira_key'])
+    elif args_dict['command'] == 'worklog':
+        arguments_dict = worklog.parse_args(args_dict)
+        worklog.run_scenario(
+            arguments_dict['jira_key'],
+            arguments_dict['jira_period_pieces'],
+        )
     else:
         arg_parser.print_usage()
 
     # TODO
-    # worklog adder
     # check nearest minor version
     # check if code freeze
 
