@@ -7,6 +7,8 @@ JIRA_DOMAIN = 'https://atlassian.atlassian.net'
 
 LOCAL_PROJECT_PATH = '/home/user/projects/markup'
 
+reviewers_shortlist = []
+
 
 def to_milestone_title(branch_name):
     to_version_re = re.compile(r"to[-|_]?(\d\d\.\d[\d]?)")
@@ -91,6 +93,11 @@ all_build_contexts = [
     'SonarQube analysis',
     'sonarqube'
 ]
+
+created_pr_default_comment = '\n'.join([
+    'SonarQube analysis',
+    'sonarqube'
+])
 
 
 def to_build_trigger_comment(builds):

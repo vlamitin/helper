@@ -1,5 +1,6 @@
 import argparse
 import os
+import subprocess
 import time
 from pprint import pprint
 
@@ -56,23 +57,42 @@ def get_new_pr_props_by_head_branch_name(
 
 
 def add_arguments(arg_parser):
-    arg_parser.add_argument('head_branch', nargs=1, type=str, help='head branch name')
-    arg_parser.add_argument('--reviewers', nargs='*', type=str, help='space delimited list of reviewers')
-    arg_parser.add_argument('--title_content', nargs=1, type=str, help='pr title (between jira task keys and version)')
+    arg_parser.add_argument('--head_branch', nargs=1, type=str, help='[optional] head branch name')
+    arg_parser.add_argument('--reviewers', nargs='*', type=str, help='[optional] space delimited list of reviewers')
+    arg_parser.add_argument(
+        '--title_content', nargs=1, type=str, help='[optional] pr title (between jira task keys and version)')
+    arg_parser.add_argument(
+        '--pr_comment', nargs=1, type=str, help='[optional] comment under created pr')
 
     return arg_parser
 
 
 def parse_args(args_dict):
     return {
-        'head_branch': args_dict['head_branch'][0],
+        'head_branch': args_dict['head_branch'] and args_dict['head_branch'][0] or '',
         'reviewers': args_dict['reviewers'] or [],
         'title_content': args_dict['title_content'] and args_dict['title_content'][0] or '',
+        'pr_comment': args_dict['pr_comment'] and args_dict['pr_comment'][0] or '',
     }
 
 
-def run_scenario(head_branch, reviewers, title_content):
-    print(head_branch)
+def run_scenario(head_branch, reviewers, title_content, pr_comment):
+    if not head_branch:
+        git_current_branch_name_output = subprocess.check_output(
+            f"git -C {settings.LOCAL_PROJECT_PATH} rev-parse --abbrev-ref HEAD", shell=True
+        )
+        potential_head_branch = git_current_branch_name_output.decode('utf-8').split("\n")[0]
+
+        head_branch_choice = input(
+            f"script: (!) No head_branch specified. Press \"Enter\" to take current branch ({potential_head_branch})" +
+            " or \"q\" to quit: "
+        )
+        if head_branch_choice in ["q", "Q"]:
+            quit(0)
+        else:
+            head_branch = potential_head_branch
+            print(f"script: creating pr from {head_branch} ...")
+
     print("script: setting creds from envs ...")
     try:
         GH_LOGIN = os.environ['PR_HELPER_GH_LOGIN']
@@ -83,6 +103,15 @@ def run_scenario(head_branch, reviewers, title_content):
     except KeyError:
         print("script: (!) no envs set, exiting")
         quit(0)
+
+    if len(reviewers) == 0:
+        for index, reviewer in enumerate(settings.reviewers_shortlist):
+            print(f"{index + 1}. {reviewer}")
+        reviewers_choice = input(
+            "script: Choose reviewers. Like so: \"1 2 4 <Enter>\": "
+        )
+        reviewers = [settings.reviewers_shortlist[int(x) - 1] for x in reviewers_choice.split(" ")]
+        print(f"script: {reviewers} selected as reviewers")
 
     for reviewer in reviewers:
         if not (check_collaborator(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME, reviewer)):
@@ -108,7 +137,7 @@ def run_scenario(head_branch, reviewers, title_content):
         quit(0)
 
     continue_choice = input(
-        "script: PR with this ^ props will be created, press \"Enter\" to continue, \"q\" to quit ..."
+        "script: PR with this ^ props will be created, press \"Enter\" to continue, \"q\" to quit: "
     )
     if continue_choice in ["q", "Q"]:
         quit(0)
@@ -137,19 +166,30 @@ def run_scenario(head_branch, reviewers, title_content):
                            created_pr['number'], reviewers)
         print(f"review requested ...")
 
-    print("script: sleeping for 180s before triggering build ...")
-    time.sleep(180)
-
-    build_trigger_comment = settings.to_build_trigger_comment(
-        get_blocking_builds(
-            list_pr_build_statuses(
-                GH_LOGIN, GH_TOKEN, created_pr['statuses_url']
+    if not pr_comment:
+        if settings.created_pr_default_comment:
+            pr_comment = settings.created_pr_default_comment
+        else:
+            pr_comment_choice = input(
+                "script: No PR comment provided. Calculate build trigger comment automatically (sleeps 180s)? (y/n): "
             )
-        )
-    )
-    print(f"script: creating comment \n{build_trigger_comment}\n ...")
-    create_issue_comment(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME,
-                         created_pr['number'], build_trigger_comment)
+            if pr_comment_choice not in ["n", "N"]:
+                print("script: sleeping for 180s before triggering build ...")
+                time.sleep(180)
+
+                pr_comment = settings.to_build_trigger_comment(
+                    get_blocking_builds(
+                        list_pr_build_statuses(
+                            GH_LOGIN, GH_TOKEN, created_pr['statuses_url']
+                        )
+                    )
+                )
+
+    if pr_comment:
+        print(f"script: creating comment \n{pr_comment}\n ...")
+        create_issue_comment(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME,
+                             created_pr['number'], pr_comment)
+
     print(f"script: comment created")
     print(f"script: done, link once again: " +
           f" https://github.com/{settings.REPO_ORG}/{settings.REPO_NAME}/pull/{created_pr['number']}")
@@ -159,7 +199,12 @@ if __name__ == '__main__':
     try:
         ap = add_arguments(argparse.ArgumentParser(description=DESCRIPTION))
         arguments_dict = parse_args(vars(ap.parse_args()))
-        run_scenario(arguments_dict['head_branch'], arguments_dict['reviewers'], arguments_dict['title_content'])
+        run_scenario(
+            arguments_dict['head_branch'],
+            arguments_dict['reviewers'],
+            arguments_dict['title_content'],
+            arguments_dict['pr_comment']
+        )
     except KeyboardInterrupt:
         print(f"\nscript: KeyboardInterrupt, exiting ...")
         quit(0)

@@ -48,6 +48,24 @@ def get_user_created_prs(gh_login, gh_token,
     return res.json()['items']
 
 
+def get_open_prs_for_jira_key(gh_login, gh_token, jira_key):
+    res = requests.get(
+        f"https://api.github.com/search/issues?q=is:open%20is:pr%20{jira_key}%20in:title%20archived:false",
+        auth=HTTPBasicAuth(gh_login, gh_token),
+        headers={'Accept': 'application/vnd.github.v3+json'}
+    )
+    return res.json()['items']
+
+
+def get_closed_prs_for_jira_key(gh_login, gh_token, jira_key):
+    res = requests.get(
+        f"https://api.github.com/search/issues?q=is:closed%20is:pr%20{jira_key}%20in:title%20archived:false",
+        auth=HTTPBasicAuth(gh_login, gh_token),
+        headers={'Accept': 'application/vnd.github.v3+json'}
+    )
+    return res.json()['items']
+
+
 def get_user_request_reviews(gh_login, gh_token,
                              username):
     res = requests.get(
@@ -59,7 +77,7 @@ def get_user_request_reviews(gh_login, gh_token,
 
 
 def get_pr_summary(gh_login, gh_token, repo_org, repo_name, pr_number):
-    pr = _get_pr(gh_login, gh_token, repo_org, repo_name, pr_number)
+    pr = get_pr(gh_login, gh_token, repo_org, repo_name, pr_number)
 
     return {
         **to_brief_pr(pr),
@@ -99,7 +117,7 @@ def update_pr(
     return res.json()
 
 
-def _get_pr(gh_login, gh_token, repo_org, repo_name, pr_number):
+def get_pr(gh_login, gh_token, repo_org, repo_name, pr_number):
     res = requests.get(
         f"https://api.github.com/repos/{repo_org}/{repo_name}/pulls/{pr_number}",
         auth=HTTPBasicAuth(gh_login, gh_token),

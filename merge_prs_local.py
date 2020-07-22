@@ -38,7 +38,7 @@ def run_scenario(merge_branch_name):
     project_path = settings.LOCAL_PROJECT_PATH
     print("script: project_path:", project_path)
     continue_choice = input(
-        "script: this prs ^ will be merged local, press \"Enter\" to continue, \"q\" to quit ..."
+        "script: this prs ^ will be merged local, press \"Enter\" to continue, \"q\" to quit: "
     )
     if continue_choice in ["q", "Q"]:
         quit(0)

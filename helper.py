@@ -38,7 +38,10 @@ def run_scenario():
     if args_dict['command'] == 'create_pr':
         arguments_dict = create_pr.parse_args(args_dict)
         create_pr.run_scenario(
-            arguments_dict['head_branch'], arguments_dict['reviewers'], arguments_dict['title_content']
+            arguments_dict['head_branch'],
+            arguments_dict['reviewers'],
+            arguments_dict['title_content'],
+            arguments_dict['pr_comment'],
         )
     elif args_dict['command'] == 'open_prs':
         open_prs.run_scenario()
@@ -55,7 +58,7 @@ def run_scenario():
         update_prs.run_scenario(arguments_dict['base_branch'])
     elif args_dict['command'] == 'cherry':
         arguments_dict = cherry.parse_args(args_dict)
-        cherry.run_scenario(arguments_dict['commits_count'])
+        cherry.run_scenario(arguments_dict['commits_count_or_jira_key'])
     else:
         arg_parser.print_usage()
 

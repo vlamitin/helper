@@ -17,6 +17,10 @@ LOCAL_PROJECT_PATH = hasattr(settings_user, 'LOCAL_PROJECT_PATH') \
                      and settings_user.LOCAL_PROJECT_PATH \
                      or settings_global.LOCAL_PROJECT_PATH
 
+reviewers_shortlist = hasattr(settings_user, 'reviewers_shortlist') \
+                     and settings_user.reviewers_shortlist \
+                     or settings_global.reviewers_shortlist
+
 
 def to_milestone_title(branch_name):
     if hasattr(settings_user, 'to_milestone_title'):
@@ -105,6 +109,11 @@ def to_pr_title(jira_tasks, cli_args_pr_title, brief_milestone):
 all_build_contexts = hasattr(settings_user, 'all_build_contexts') \
                      and settings_user.all_build_contexts \
                      or settings_global.all_build_contexts
+
+
+created_pr_default_comment = hasattr(settings_user, 'created_pr_default_comment') \
+                     and settings_user.created_pr_default_comment \
+                     or settings_global.created_pr_default_comment
 
 
 def to_build_trigger_comment(builds):
