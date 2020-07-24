@@ -8,4 +8,5 @@ install: init
  && echo "${PWD}/venv/bin/python ${PWD}/helper.py \$$@" >> /home/${USER}/bin/helper\
  && chmod +x /home/${USER}/bin/helper\
  && rm -f /home/${USER}/bin/helper_login\
- && ln -s ${PWD}/login.sh /home/${USER}/bin/helper_login
+ && ln -s ${PWD}/login.sh /home/${USER}/bin/helper_login\
+ && ln -s ${PWD}/helper-completion.bash /home/${USER}/bin/helper-completion.bash

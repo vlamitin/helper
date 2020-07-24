@@ -27,5 +27,6 @@ scripts to ease work with github, jira, jenkins
 - `make install` - installs virtualenv and all dependencies (locally), creates /home/$USER/bin/helper script and /home/$USER/bin/helper_login
 
 ## usage
+- [optional] `source ~/bin/helper-completion.bash` (once per terminal session, to set bash completions)
 - `source helper_login` (once per terminal session, to set tokens)
 - `helper -h`
