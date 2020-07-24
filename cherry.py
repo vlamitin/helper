@@ -72,8 +72,8 @@ def run_scenario(commits_count_or_jira_key):
     commits_count = 0
     argument_jira_key = ''
 
-    if re.compile(r"^\d{1,3}$").match(commits_count_or_jira_key):
-        commits_count = int(commits_count_or_jira_key)
+    if re.compile(r"^-?\d{1,3}$").match(commits_count_or_jira_key):
+        commits_count = abs(int(commits_count_or_jira_key))
         print(f"script: commits_count set to {commits_count}")
     else:
         argument_jira_key = commits_count_or_jira_key
@@ -224,12 +224,17 @@ def get_base_brahches(gh_login, gh_token, jira_tasks):
 
     # remove base branches where pr is already open
     for jira_task in [to_brief_jira_task(x) for x in jira_tasks]:
-        for release_version, release_branch in branches_dict[jira_task['key']]:
+        items_to_remove = []
+        for i in range(len(branches_dict[jira_task['key']])):
+            release_version, release_branch = branches_dict[jira_task['key']][i]
             prs = list_prs(gh_login, gh_token, settings.REPO_ORG, settings.REPO_NAME, release_branch)
             for pr in prs:
                 if jira_task['key'].lower() in pr['head']['ref'].lower():
                     print(f"script: (!) {jira_task['key']} already has PR to {pr['head']['ref']}, skipping ...")
-                    branches_dict[jira_task['key']].remove((release_version, release_branch))
+                    items_to_remove.append((release_version, release_branch))
+
+        for item in items_to_remove:
+            branches_dict[jira_task['key']].remove(item)
 
     if len(set(
             ['__'.join([x[0] for x in branches_dict[jira_key]]) for jira_key in branches_dict]
