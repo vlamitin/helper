@@ -53,7 +53,7 @@ def run_scenario():
         open_jira_tasks.run_scenario()
     elif args_dict['command'] == 'merge_prs_local':
         arguments_dict = merge_prs_local.parse_args(args_dict)
-        merge_prs_local.run_scenario(arguments_dict['merge_branch_name'])
+        merge_prs_local.run_scenario(arguments_dict['merge_branch_name'], arguments_dict['base_branch_name'])
     elif args_dict['command'] == 'print_jira_tree':
         arguments_dict = print_jira_tree.parse_args(args_dict)
         print_jira_tree.run_scenario(arguments_dict['task_key'])

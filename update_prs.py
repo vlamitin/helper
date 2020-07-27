@@ -44,7 +44,7 @@ def run_scenario(base_branch_name):
     ]
 
     print("script: prs to be updated:")
-    pprint(branches_chain)
+    pprint([f"{i + 1}. {x[0]} -> {x[1]}" for i, x in enumerate(branches_chain)])
     project_path = settings.LOCAL_PROJECT_PATH
     print("script: project_path:", project_path)
     continue_choice = input(
@@ -75,15 +75,10 @@ def run_scenario(base_branch_name):
             print("script: (!) failed to pull, exiting")
             quit(0)
 
-        print(f"CHANGES=$(git -C {project_path} cherry -v origin/{branch[0]} | wc -l);" +
-              f" [ $CHANGES != '0' ] " +
-              f"&& git -C {project_path} push origin {branch[0]}")
-
         print(f"script: push origin {branch[0]}")
         git_push_code = os.system(f"CHANGES=$(git -C {project_path} cherry -v origin/{branch[0]} | wc -l);" +
                                   f" [ $CHANGES != '0' ] " +
                                   f"&& git -C {project_path} push origin {branch[0]} || echo 'already pushed'")
-        print("git_push_code", git_push_code)
         if git_push_code != 0:
             print("script: (!) failed to push, exiting")
             quit(0)
