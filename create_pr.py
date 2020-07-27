@@ -33,6 +33,11 @@ def get_new_pr_props_by_head_branch_name(
         brief_milestones
     )
 
+    if not brief_milestone:
+        print(f"script: (!) no milestone {settings.to_version(head_branch_name)} created (create it manually here" +
+              f" https://github.com/{settings.REPO_ORG}/{settings.REPO_NAME}/milestones/new and repeat), exiting")
+        quit(0)
+
     title = settings.to_pr_title(jira_tasks,
                                  title_content,
                                  brief_milestone)
