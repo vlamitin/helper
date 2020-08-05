@@ -1,3 +1,6 @@
+import json
+from datetime import datetime
+
 import requests
 import os
 from pprint import pprint
@@ -14,6 +17,30 @@ def get_jira_task(jira_domain, jira_login, jira_token, task_key):
         auth=HTTPBasicAuth(jira_login, jira_token),
     )
     return res.json()
+
+
+def get_jira_task_histories(jira_domain, jira_login, jira_token, task_key):
+    res = requests.get(
+        f"{jira_domain}/rest/api/2/issue/{task_key}?expand=changelog",
+        auth=HTTPBasicAuth(jira_login, jira_token),
+    )
+    return res.json()['changelog']['histories']
+
+
+def patch_jira_task(jira_domain, jira_login, jira_token, task_key, fields):
+    res = requests.put(
+        f"{jira_domain}/rest/api/3/issue/{task_key}",
+        auth=HTTPBasicAuth(jira_login, jira_token),
+        headers={
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        },
+        data=json.dumps({
+            'fields': fields
+        })
+    )
+    return res.text
+    # return json.dumps(json.loads(res.text), sort_keys=True, indent=4, separators=(",", ": "))
 
 
 def get_children_tasks(jira_domain, jira_login, jira_token, task_key):
@@ -81,6 +108,10 @@ def get_brief_tasks_tree(jira_domain, jira_login, jira_token, root_task):
         'sum_estimate_h': to_human_readable_jira_period(sum_estimate),
         **to_brief_jira_task(root_task)
     }
+
+
+def to_datetime(iso_date):
+    return datetime.strptime(iso_date, "%Y-%m-%dT%H:%M:%S.%f%z")
 
 
 if __name__ == '__main__':
