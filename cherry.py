@@ -2,7 +2,6 @@ import argparse
 import os
 import re
 import subprocess
-from pprint import pprint
 
 import create_pr
 import settings
@@ -69,6 +68,8 @@ def get_branch_and_commits_from_local_repo(commits_count):
 
 
 def run_scenario(commits_count_or_jira_key):
+    creds = settings.get_creds()
+    
     commits_count = 0
     argument_jira_key = ''
 
@@ -79,26 +80,16 @@ def run_scenario(commits_count_or_jira_key):
         argument_jira_key = commits_count_or_jira_key
         print(f"script: argument_jira_key set to {argument_jira_key}")
 
-    print("script: setting creds from envs ...")
-    try:
-        GH_LOGIN = os.environ['PR_HELPER_GH_LOGIN']
-        GH_TOKEN = os.environ['PR_HELPER_GH_TOKEN']
-        JIRA_DOMAIN = os.environ['PR_HELPER_JIRA_DOMAIN']
-        JIRA_LOGIN = os.environ['PR_HELPER_JIRA_LOGIN']
-        JIRA_TOKEN = os.environ['PR_HELPER_JIRA_TOKEN']
-    except KeyError:
-        print("script: (!) no envs set, exiting")
-        quit(0)
-
     if commits_count:
         current_branch_name, commit_hashes = get_branch_and_commits_from_local_repo(commits_count)
     else:
-        current_branch_name, commit_hashes = get_branch_and_commits_from_jira_key(GH_LOGIN, GH_TOKEN, argument_jira_key)
+        current_branch_name, commit_hashes = get_branch_and_commits_from_jira_key(creds['GH_LOGIN'], creds['GH_TOKEN'],
+                                                                                  argument_jira_key)
 
     task_keys = settings.to_jira_task_keys(current_branch_name)
-    jira_tasks = [get_jira_task(JIRA_DOMAIN, JIRA_LOGIN, JIRA_TOKEN, x) for x in task_keys]
+    jira_tasks = [get_jira_task(creds['JIRA_DOMAIN'], creds['JIRA_LOGIN'], creds['JIRA_TOKEN'], x) for x in task_keys]
 
-    base_branches = get_base_brahches(GH_LOGIN, GH_TOKEN, jira_tasks)
+    base_branches = get_base_brahches(creds['GH_LOGIN'], creds['GH_TOKEN'], jira_tasks)
 
     for jira_task in jira_tasks:
         brief_jt = to_brief_jira_task(jira_task)
@@ -120,7 +111,8 @@ def run_scenario(commits_count_or_jira_key):
 
     for version, base_branch in base_branches:
         new_branch_name = settings.to_new_version_branch_name(current_branch_name, version)
-        if check_branch_exists(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME, new_branch_name):
+        if check_branch_exists(creds['GH_LOGIN'], creds['GH_TOKEN'], settings.REPO_ORG, settings.REPO_NAME,
+                               new_branch_name):
             continue_choice = input(
                 f"script: (!) branch {new_branch_name} " +
                 f"already exists in remote; press \"Enter\" to skip this branch, \"q\" to quit: "

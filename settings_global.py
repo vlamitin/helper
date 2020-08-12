@@ -1,13 +1,27 @@
+import os
 import re
 
 REPO_ORG = 'github'
 REPO_NAME = 'markup'
 
-JIRA_DOMAIN = 'https://atlassian.atlassian.net'
-
 LOCAL_PROJECT_PATH = '/home/user/projects/markup'
 
 reviewers_shortlist = []
+
+
+def get_creds():
+    print("script: getting creds from envs ...")
+    try:
+        return {
+            'GH_LOGIN': os.environ['PR_HELPER_GH_LOGIN'],
+            'GH_TOKEN': os.environ['PR_HELPER_GH_TOKEN'],
+            'JIRA_DOMAIN': os.environ['PR_HELPER_JIRA_DOMAIN'],
+            'JIRA_LOGIN': os.environ['PR_HELPER_JIRA_LOGIN'],
+            'JIRA_TOKEN': os.environ['PR_HELPER_JIRA_TOKEN'],
+        }
+    except KeyError:
+        print("script: (!) no envs set, exiting")
+        quit(0)
 
 
 def to_milestone_title(branch_name):

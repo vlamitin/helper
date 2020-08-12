@@ -1,6 +1,3 @@
-import os
-from pprint import pprint
-
 import requests
 from requests.auth import HTTPBasicAuth
 
@@ -16,12 +13,4 @@ def list_pr_commits(gh_login, gh_token, repo_org, repo_name, pr_number):
 
 
 if __name__ == '__main__':
-    print("script: setting creds from envs ...")
-    try:
-        GH_LOGIN = os.environ['PR_HELPER_GH_LOGIN']
-        GH_TOKEN = os.environ['PR_HELPER_GH_TOKEN']
-    except KeyError:
-        print("script: (!) no envs set, exiting")
-        quit(0)
-
-    pprint("TODO debug")
+    print('DEBUG')

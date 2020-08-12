@@ -9,10 +9,6 @@ REPO_NAME = hasattr(settings_user, 'REPO_NAME') \
                      and settings_user.REPO_NAME \
                      or settings_global.REPO_NAME
 
-JIRA_DOMAIN = hasattr(settings_user, 'JIRA_DOMAIN') \
-                     and settings_user.JIRA_DOMAIN \
-                     or settings_global.JIRA_DOMAIN
-
 LOCAL_PROJECT_PATH = hasattr(settings_user, 'LOCAL_PROJECT_PATH') \
                      and settings_user.LOCAL_PROJECT_PATH \
                      or settings_global.LOCAL_PROJECT_PATH
@@ -20,6 +16,13 @@ LOCAL_PROJECT_PATH = hasattr(settings_user, 'LOCAL_PROJECT_PATH') \
 reviewers_shortlist = hasattr(settings_user, 'reviewers_shortlist') \
                      and settings_user.reviewers_shortlist \
                      or settings_global.reviewers_shortlist
+
+
+def get_creds():
+    if hasattr(settings_user, 'get_creds'):
+        return settings_user.get_creds()
+
+    return settings_global.get_creds()
 
 
 def to_milestone_title(branch_name):

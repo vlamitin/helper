@@ -1,31 +1,23 @@
 import argparse
-import os
 from pprint import pprint
 from webbrowser import open_new_tab
 
+import settings
 from internal.pr import get_user_created_prs, get_user_request_reviews
 
 DESCRIPTION = "Opens your created and your review requested prs"
 
 
 def run_scenario():
-    print("script: setting creds from envs ...")
-    try:
-        GH_LOGIN = os.environ['PR_HELPER_GH_LOGIN']
-        GH_TOKEN = os.environ['PR_HELPER_GH_TOKEN']
-    except KeyError:
-        print("script: (!) no envs set, exiting")
-        quit(0)
-
-    print(f"script: fetching created by {GH_LOGIN} prs ...")
-    created_prs = get_user_created_prs(
-        GH_LOGIN, GH_TOKEN, GH_LOGIN,
-    )
+    creds = settings.get_creds()
+    
+    print(f"script: fetching created by {creds['GH_LOGIN']} prs ...")
+    created_prs = get_user_created_prs(creds['GH_LOGIN'], creds['GH_TOKEN'], creds['GH_LOGIN'])
     print(f"script: {len(created_prs)} created_prs fetched")
 
-    print(f"script: fetching review from {GH_LOGIN} requested prs ...")
+    print(f"script: fetching review from {creds['GH_LOGIN']} requested prs ...")
     requested_pr_reviews = get_user_request_reviews(
-        GH_LOGIN, GH_TOKEN, GH_LOGIN,
+        creds['GH_LOGIN'], creds['GH_TOKEN'], creds['GH_LOGIN'],
     )
 
     print(f"script: {len(requested_pr_reviews)} requested_pr_reviews fetched")
