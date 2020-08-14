@@ -1,4 +1,3 @@
-import os
 import requests
 from pprint import pprint
 from requests.auth import HTTPBasicAuth
@@ -23,12 +22,4 @@ def check_collaborator(
 
 
 if __name__ == '__main__':
-    print("script: setting creds from envs ...")
-    try:
-        GH_LOGIN = os.environ['PR_HELPER_GH_LOGIN']
-        GH_TOKEN = os.environ['PR_HELPER_GH_TOKEN']
-    except KeyError:
-        print("script: (!) no envs set, exiting")
-        quit(0)
-
     pprint("TODO debug")

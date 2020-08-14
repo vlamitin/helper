@@ -1,5 +1,4 @@
 import argparse
-import os
 import subprocess
 import time
 from pprint import pprint
@@ -44,7 +43,7 @@ def get_new_pr_props_by_head_branch_name(
 
     jira_links_comment = '\n'.join(
         [
-            f"[{x['key']} - {x['fields']['summary']}]({settings.JIRA_DOMAIN}/browse/{x['key']})"
+            f"[{x['key']} - {x['fields']['summary']}]({jira_domain}/browse/{x['key']})"
             for x in jira_tasks
         ]
     )
@@ -82,6 +81,8 @@ def parse_args(args_dict):
 
 
 def run_scenario(head_branch, reviewers, title_content, pr_comment):
+    creds = settings.get_creds()
+
     if not head_branch:
         git_current_branch_name_output = subprocess.check_output(
             f"git -C {settings.LOCAL_PROJECT_PATH} rev-parse --abbrev-ref HEAD", shell=True
@@ -98,17 +99,6 @@ def run_scenario(head_branch, reviewers, title_content, pr_comment):
             head_branch = potential_head_branch
             print(f"script: creating pr from {head_branch} ...")
 
-    print("script: setting creds from envs ...")
-    try:
-        GH_LOGIN = os.environ['PR_HELPER_GH_LOGIN']
-        GH_TOKEN = os.environ['PR_HELPER_GH_TOKEN']
-        JIRA_DOMAIN = os.environ['PR_HELPER_JIRA_DOMAIN']
-        JIRA_LOGIN = os.environ['PR_HELPER_JIRA_LOGIN']
-        JIRA_TOKEN = os.environ['PR_HELPER_JIRA_TOKEN']
-    except KeyError:
-        print("script: (!) no envs set, exiting")
-        quit(0)
-
     if len(reviewers) == 0:
         for index, reviewer in enumerate(settings.reviewers_shortlist):
             print(f"{index + 1}. {reviewer}")
@@ -119,24 +109,26 @@ def run_scenario(head_branch, reviewers, title_content, pr_comment):
         print(f"script: {reviewers} selected as reviewers")
 
     for reviewer in reviewers:
-        if not (check_collaborator(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME, reviewer)):
+        if not (check_collaborator(creds['GH_LOGIN'], creds['GH_TOKEN'], settings.REPO_ORG, settings.REPO_NAME,
+                                   reviewer)):
             print(f"script: (!) {reviewer} is not a collaborator")
             quit(0)
 
-    if not check_branch_exists(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME, head_branch):
+    if not check_branch_exists(creds['GH_LOGIN'], creds['GH_TOKEN'], settings.REPO_ORG, settings.REPO_NAME,
+                               head_branch):
         print(f"script: (!) head branch \"{head_branch}\" does not exist on remote")
         quit(0)
 
     print("script: fetching branch new pr summary...")
     new_pr_summary = get_new_pr_props_by_head_branch_name(
-        GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME,
-        JIRA_DOMAIN, JIRA_LOGIN, JIRA_TOKEN,
+        creds['GH_LOGIN'], creds['GH_TOKEN'], settings.REPO_ORG, settings.REPO_NAME,
+        creds['JIRA_DOMAIN'], creds['JIRA_LOGIN'], creds['JIRA_TOKEN'],
         head_branch, title_content
     )
 
     pprint(new_pr_summary, width=140, indent=2)
 
-    if not check_branch_exists(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME,
+    if not check_branch_exists(creds['GH_LOGIN'], creds['GH_TOKEN'], settings.REPO_ORG, settings.REPO_NAME,
                                new_pr_summary['base_branch_name']):
         print(f"script: (!) base branch \"{new_pr_summary['base_branch_name']}\" does not exist on remote")
         quit(0)
@@ -147,27 +139,27 @@ def run_scenario(head_branch, reviewers, title_content, pr_comment):
     if continue_choice in ["q", "Q"]:
         quit(0)
 
-    pr_body_template = get_file_content(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME,
+    pr_body_template = get_file_content(creds['GH_LOGIN'], creds['GH_TOKEN'], settings.REPO_ORG, settings.REPO_NAME,
                                         'PULL_REQUEST_TEMPLATE.md')
     pr_body = pr_body_template.replace(
-        f"[Ссылка на задачу]({settings.JIRA_DOMAIN}/browse/)",
+        f"[Ссылка на задачу]({creds['JIRA_DOMAIN']}/browse/)",
         new_pr_summary['jira_links_comment'],
     )
 
     print("script: creating pr ...")
-    created_pr = create_pr(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME,
+    created_pr = create_pr(creds['GH_LOGIN'], creds['GH_TOKEN'], settings.REPO_ORG, settings.REPO_NAME,
                            new_pr_summary['title'], pr_body,
                            new_pr_summary['head_branch_name'], new_pr_summary['base_branch_name'])
     print(f"script: created pr https://github.com/{settings.REPO_ORG}/{settings.REPO_NAME}/pull/{created_pr['number']}")
 
     print("script: setting milestone and labels ...")
-    update_pr(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME,
+    update_pr(creds['GH_LOGIN'], creds['GH_TOKEN'], settings.REPO_ORG, settings.REPO_NAME,
               created_pr['number'], new_pr_summary['milestone_number'], new_pr_summary['labels'])
     print("script: successfully updated pr with milestone and labels")
 
     if reviewers and len(reviewers) > 0:
         print(f"script: requesting reviewers {reviewers} ...")
-        request_pr_reviews(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME,
+        request_pr_reviews(creds['GH_LOGIN'], creds['GH_TOKEN'], settings.REPO_ORG, settings.REPO_NAME,
                            created_pr['number'], reviewers)
         print(f"review requested ...")
 
@@ -185,14 +177,14 @@ def run_scenario(head_branch, reviewers, title_content, pr_comment):
                 pr_comment = settings.to_build_trigger_comment(
                     get_blocking_builds(
                         list_pr_build_statuses(
-                            GH_LOGIN, GH_TOKEN, created_pr['statuses_url']
+                            creds['GH_LOGIN'], creds['GH_TOKEN'], created_pr['statuses_url']
                         )
                     )
                 )
 
     if pr_comment:
         print(f"script: creating comment \n{pr_comment}\n ...")
-        create_issue_comment(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME,
+        create_issue_comment(creds['GH_LOGIN'], creds['GH_TOKEN'], settings.REPO_ORG, settings.REPO_NAME,
                              created_pr['number'], pr_comment)
 
     print(f"script: comment created")

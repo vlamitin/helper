@@ -38,8 +38,7 @@ def list_open_prs(gh_login, gh_token, repo_org, repo_name):
 
 
 # https://docs.github.com/en/github/searching-for-information-on-github/searching-issues-and-pull-requests#search-within-a-users-or-organizations-repositories
-def get_user_created_prs(gh_login, gh_token,
-                         username):
+def get_user_created_prs(gh_login, gh_token, username):
     res = requests.get(
         f"https://api.github.com/search/issues?q=is:open%20is:pr%20author:{username}%20archived:false",
         auth=HTTPBasicAuth(gh_login, gh_token),

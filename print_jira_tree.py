@@ -1,7 +1,7 @@
 import argparse
-import os
 from pprint import pprint
 
+import settings
 from internal.jira_task import get_brief_tasks_tree, get_jira_task
 
 DESCRIPTION = "Prints tree of subtasks for given task key or epic jira key"
@@ -20,17 +20,11 @@ def parse_args(args_dict):
 
 
 def run_scenario(task_key):
-    print("script: setting creds from envs ...")
-    try:
-        JIRA_DOMAIN = os.environ['PR_HELPER_JIRA_DOMAIN']
-        JIRA_LOGIN = os.environ['PR_HELPER_JIRA_LOGIN']
-        JIRA_TOKEN = os.environ['PR_HELPER_JIRA_TOKEN']
-    except KeyError:
-        print("script: (!) no envs set, exiting")
-        quit(0)
+    creds = settings.get_creds()
 
-    pprint(get_brief_tasks_tree(JIRA_DOMAIN, JIRA_LOGIN, JIRA_TOKEN,
-                                get_jira_task(JIRA_DOMAIN, JIRA_LOGIN, JIRA_TOKEN, task_key)))
+    pprint(get_brief_tasks_tree(creds['JIRA_DOMAIN'], creds['JIRA_LOGIN'], creds['JIRA_TOKEN'],
+                                get_jira_task(creds['JIRA_DOMAIN'], creds['JIRA_LOGIN'], creds['JIRA_TOKEN'], task_key))
+           )
 
 
 if __name__ == '__main__':

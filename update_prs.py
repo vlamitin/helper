@@ -22,15 +22,9 @@ def parse_args(args_dict):
 
 
 def run_scenario(base_branch_name):
-    print("script: setting creds from envs ...")
-    try:
-        GH_LOGIN = os.environ['PR_HELPER_GH_LOGIN']
-        GH_TOKEN = os.environ['PR_HELPER_GH_TOKEN']
-    except KeyError:
-        print("script: (!) no envs set, exiting")
-        quit(0)
-
-    open_prs = list_open_prs(GH_LOGIN, GH_TOKEN, settings.REPO_ORG, settings.REPO_NAME)
+    creds = settings.get_creds()
+    
+    open_prs = list_open_prs(creds['GH_LOGIN'], creds['GH_TOKEN'], settings.REPO_ORG, settings.REPO_NAME)
     prs_to_update = settings.filter_prs_to_update(open_prs)
     short_prs_to_update = [(x['head']['ref'], x['base']['ref']) for x in prs_to_update]
 
