@@ -33,8 +33,20 @@ def get_new_pr_props_by_head_branch_name(
     )
 
     if not brief_milestone:
-        print(f"script: (!) no milestone {settings.to_version(head_branch_name)} created (create it manually here" +
-              f" https://github.com/{settings.REPO_ORG}/{settings.REPO_NAME}/milestones/new and repeat), exiting")
+        if base_branch_name:
+            print(f"script: (!) no milestone {settings.to_version(head_branch_name)} created you can (create it " +
+                  f"manually here https://github.com/{settings.REPO_ORG}/{settings.REPO_NAME}/milestones/new)")
+        else:
+            print("script: (!) Failed to calculate milestone from head branch name. No milestone will be set!")
+
+    if not base_branch_name:
+        base_branch_name = input(
+            "script: Failed to calculate base branch name from head branch name. Please specify base branch: "
+        )
+        print(f"script: {base_branch_name} selected as base_branch_name")
+
+    if not check_branch_exists(gh_login, gh_token, repo_org, repo_name, base_branch_name):
+        print(f"script: (!) base branch \"{base_branch_name}\" does not exist on remote")
         quit(0)
 
     title = settings.to_pr_title(jira_tasks,
@@ -52,8 +64,8 @@ def get_new_pr_props_by_head_branch_name(
         'title': title,
         'task_keys': task_keys,
         'jira_links_comment': jira_links_comment,
-        'milestone_number': brief_milestone['number'],
-        'milestone_title': brief_milestone['title'],
+        'milestone_number': brief_milestone and brief_milestone['number'] or None,
+        'milestone_title': brief_milestone and brief_milestone['title'] or None,
         'labels': labels,
         'head_branch_name': head_branch_name,
         'base_branch_name': base_branch_name,

@@ -107,11 +107,15 @@ def update_pr(
         gh_login, gh_token, repo_org, repo_name,
         pr_number, milestone_number, labels,
 ):
+    request_data = {'labels': labels}
+    if milestone_number:
+        request_data['milestone'] = milestone_number
+
     res = requests.patch(
         f"https://api.github.com/repos/{repo_org}/{repo_name}/issues/{pr_number}",
         auth=HTTPBasicAuth(gh_login, gh_token),
         headers={'Accept': 'application/vnd.github.v3+json'},
-        data=json.dumps({'milestone': milestone_number, 'labels': labels})
+        data=json.dumps(request_data)
     )
     return res.json()
 

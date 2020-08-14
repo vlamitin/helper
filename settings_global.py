@@ -99,7 +99,9 @@ def to_pr_title(jira_tasks, cli_args_pr_title, brief_milestone):
     else:
         title += jira_tasks[0]['fields']['summary']
 
-    title += f" (to {brief_milestone['title']})"
+    if brief_milestone:
+        title += f" (to {brief_milestone['title']})"
+
     return title
 
 

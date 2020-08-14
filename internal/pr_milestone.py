@@ -46,8 +46,7 @@ def brief_milestone_and_base_branch_name_by_head_branch(head_branch_name, brief_
                 result_base_branch = settings.to_release_branch_name(settings.to_version(head_branch_name))
     else:
         if sorted_mstones[0]['title'][-1] == '0':
-            result_milestone = sorted_mstones[0]
-            result_base_branch = 'master'
+            result_base_branch = None
 
     return result_milestone, result_base_branch
 
