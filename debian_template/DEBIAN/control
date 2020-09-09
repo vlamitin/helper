@@ -1,0 +1,10 @@
+Package: nanny
+Version: 1.0-1
+Section: base
+Priority: optional
+Architecture: amd64
+Maintainer: Dmitry Romashov <dmitry@romashov.tech>
+Description: Hello World
+ When you need some sunshine, just run this
+ small program!
+
