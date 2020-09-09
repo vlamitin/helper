@@ -27,7 +27,7 @@ jobs:
       deploy:
         provider: releases
         api_key: $GITHUB_OAUTH_TOKEN
-        file: nanny_1.0-1.deb
+        file: nanny_1.0-2.deb
         skip_cleanup: true
 
 stages:
