@@ -1,0 +1,21 @@
+jobs:
+  include:
+    - stage: Build
+      language: csharp
+      dist: xenial
+      mono: none
+      dotnet: 3.1
+      install: 
+        - dotnet clean
+        - dotnet restore
+      script:
+        - dotnet build
+
+stages:
+  - name: Build
+    if: type != pull_request
+branches:
+  only:
+    - /.*/
+notifications:
+  email: false
