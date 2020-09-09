@@ -1,11 +1,11 @@
-ifeq ($(RELEASE_NUMBER),)
-	VERSION = 1.0-0
+ifeq ($(PACKAGE_FILENAME_WITHOUT_EXTENSION),)
+	FILENAME = nanny_1.0-0
 else
-	VERSION = $(RELEASE_NUMBER)
+	FILENAME = $(PACKAGE_FILENAME_WITHOUT_EXTENSION)
 endif
 
 release:
 	dotnet publish Nanny.Console/Nanny.Console.csproj -c Release --self-contained -r ubuntu.20.04-x64 -o debian_template/opt/kolenkainc/nanny
-	cp -R debian_template nanny_$(VERSION)
-	dpkg-deb --build nanny_$(VERSION)
-	rm -rf nanny_$(VERSION)
+	cp -R debian_template $(FILENAME)
+	dpkg-deb --build $(FILENAME)
+	rm -rf $(FILENAME)
