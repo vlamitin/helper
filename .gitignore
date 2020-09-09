@@ -232,5 +232,6 @@ _Pvt_Extensions
 
 
 # Debian files
-opt/kolenkainc/nanny
-!opt/kolenkainc/nanny/.gitkeep
+debian_template/opt/kolenkainc/nanny/
+!debian_template/opt/kolenkainc/nanny/.gitkeep
+*.deb
