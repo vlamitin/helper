@@ -11,9 +11,26 @@ jobs:
       script:
         - dotnet build
 
+    - stage: Deploy
+      language: minimal
+      env:
+        - RELEASE_NUMBER=1.0-$TRAVIS_BUILD_NUMBER
+      script:
+        - make release
+      before_deploy:
+        - git config --local user.name $GIT_USERNAME
+        - git config --local user.email $GIT_EMAIL
+        - git tag $RELEASE_NUMBER
+      deploy:
+        provider: releases
+        api_key: $GITHUB_OAUTH_TOKEN
+        skip_cleanup: true
+
 stages:
   - name: Build
     if: type != pull_request
+  - name: Deploy
+    if: branch = master AND type != pull_request
 branches:
   only:
     - /.*/
