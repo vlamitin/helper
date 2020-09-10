@@ -11,7 +11,7 @@ jobs:
       script:
         - dotnet build
 
-    - stage: Deploy
+    - stage: Deploy to Github Releases
       language: csharp
       dist: xenial
       mono: none
@@ -32,10 +32,29 @@ jobs:
         file: $PACKAGE_FILENAME
         skip_cleanup: true
 
+    - stage: Deploy to Launchpad
+      language: csharp
+      dist: xenial
+      mono: none
+      dotnet: 3.1
+      env:
+        - RELEASE_NUMBER=1.0-$TRAVIS_BUILD_NUMBER
+        - PACKAGE_FILENAME_WITHOUT_EXTENSION=nanny_$RELEASE_NUMBER
+        - PACKAGE_FILENAME=$PACKAGE_FILENAME_WITHOUT_EXTENSION.deb
+      script:
+        - make release
+      deploy:
+        provider: launchpad
+        slug: Nanny-Github
+        oauth_token: $LAUNCHPAD_OAUTH_TOKEN
+        oauth_token_secret: $LAUNCHPAD_OAUTH_TOKEN_SECRET
+
 stages:
   - name: Build
     if: type != pull_request
-  - name: Deploy
+  - name: Deploy to Github Releases
+    if: branch = master AND type != pull_request
+  - name: Deploy to Launchpad
     if: branch = master AND type != pull_request
 branches:
   only:
