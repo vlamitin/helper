@@ -1,12 +1,25 @@
-﻿using System;
+﻿using Nanny.Console.Visualization;
 
-namespace Nanny
+namespace Nanny.Console
 {
-    class Program
+    public class Program
     {
+        private Output _output;
+
+        public Program()
+        {
+            _output = new Output();
+        }
+        
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Program program = new Program();
+            program.Run(args);
+        }
+
+        public void Run(string[] args)
+        {
+            _output.Parse(args);
         }
     }
 }
