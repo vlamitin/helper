@@ -5,8 +5,11 @@ else
 endif
 
 release:
-	dotnet publish Nanny.Console/Nanny.Console.csproj -c Release --self-contained -r ubuntu.20.04-x64 -o debian_template/opt/kolenkainc/nanny
-	cp -R debian_template $(FILENAME)
+	release-deb
+
+release-deb:
+	dotnet publish Nanny.Console/Nanny.Console.csproj -c Release --self-contained -r ubuntu.20.04-x64 -o Packaging/debian/opt/kolenkainc/nanny
+	cp -R Packaging/debian $(FILENAME)
 	dpkg-deb --build $(FILENAME)
 	rm -rf $(FILENAME)
 

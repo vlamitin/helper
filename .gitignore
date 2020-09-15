@@ -232,7 +232,10 @@ _Pvt_Extensions
 
 
 # Debian files
-debian_template/opt/kolenkainc/nanny/
-!debian_template/opt/kolenkainc/nanny/.gitkeep
+Packaging/debian/opt/kolenkainc/nanny/
+!Packaging/debian/opt/kolenkainc/nanny/.gitkeep
 nanny_*
 *.deb
+
+# Brew
+brew
