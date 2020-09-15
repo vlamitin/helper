@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <RuntimeIdentifiers>ubuntu.20.04-x64</RuntimeIdentifiers>
+    <RuntimeIdentifiers>ubuntu.20.04-x64;osx.10.12-x64</RuntimeIdentifiers>
   </PropertyGroup>
 
 </Project>
