@@ -1,7 +1,7 @@
-ifeq ($(PACKAGE_FILENAME_WITHOUT_EXTENSION),)
-	FILENAME = nanny_1.0-0
+ifeq ($(version),)
+	FILENAME = nanny_1.0.0.0
 else
-	FILENAME = $(PACKAGE_FILENAME_WITHOUT_EXTENSION)
+	FILENAME = nanny_$(version)
 endif
 
 release:
