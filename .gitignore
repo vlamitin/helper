@@ -238,6 +238,7 @@ Packaging/debian/opt/kolenkainc/nanny/
 !Packaging/debian/opt/kolenkainc/nanny/.gitkeep
 nanny_*
 *.deb
+Packaging/debian/DEBIAN/control
 
 # Brew
 brew
