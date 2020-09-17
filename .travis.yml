@@ -20,12 +20,11 @@ jobs:
         - RELEASE_NUMBER=1.0-$TRAVIS_BUILD_NUMBER
         - PACKAGE_FILENAME_WITHOUT_EXTENSION=nanny_$RELEASE_NUMBER
         - PACKAGE_FILENAME=$PACKAGE_FILENAME_WITHOUT_EXTENSION.deb
-      script:
-        - make release
       before_deploy:
         - git config --local user.name $GIT_USERNAME
         - git config --local user.email $GIT_EMAIL
-        - git tag $RELEASE_NUMBER
+        - ./Scripts/set_version.sh
+        - make release
       deploy:
         provider: releases
         api_key: $GITHUB_OAUTH_TOKEN
