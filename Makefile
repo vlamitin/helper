@@ -1,7 +1,7 @@
-ifeq ($(version),)
+ifeq ($(git describe --abbrev=0 --tags),)
 	FILENAME = nanny_1.0.0.0
 else
-	FILENAME = nanny_$(version)
+	FILENAME = nanny_$(git describe --abbrev=0 --tags)
 endif
 
 release:

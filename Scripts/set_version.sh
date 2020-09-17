@@ -64,5 +64,4 @@ increment_version() {
 
 version=$(increment_version $(git describe --abbrev=0 --tags))
 # git tag $version
-echo $version
 sed -e "s|VERSION|$version|" ./Packaging/debian/DEBIAN/control.txt > ./Packaging/debian/DEBIAN/control
