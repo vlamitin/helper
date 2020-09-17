@@ -5,7 +5,7 @@ else
 endif
 
 release:
-	release-deb
+	make release-deb
 
 release-deb:
 	dotnet publish Nanny.Console/Nanny.Console.csproj -c Release --self-contained -r ubuntu.20.04-x64 -o Packaging/debian/opt/kolenkainc/nanny
