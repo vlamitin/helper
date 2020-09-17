@@ -1,14 +1,17 @@
-﻿using Nanny.Console.Visualization;
+﻿using Nanny.Console.Commands;
+using Nanny.Console.Printers;
 
 namespace Nanny.Console
 {
     public class Program
     {
-        private Output _output;
+        private CommandList _commands;
 
         public Program()
         {
-            _output = new Output();
+            _commands = new CommandList();
+            _commands.Add(new VersionCommand());
+            _commands.Add(new HelpCommand());
         }
         
         static void Main(string[] args)
@@ -19,7 +22,7 @@ namespace Nanny.Console
 
         public void Run(string[] args)
         {
-            _output.Parse(args);
+            new ConsolePrinter(_commands.Find(args, new HelpCommand())).Print();
         }
     }
 }
