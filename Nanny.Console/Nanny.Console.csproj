@@ -8,7 +8,7 @@
     <Authors>Kolenka Inc</Authors>
     <SignAssembly>true</SignAssembly>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <Version Condition="'$(Version)' == ''">1.0.1.2</Version>
+    <Version Condition="'$(VERSION)' == ''">1.0.1.2</Version>
   </PropertyGroup>
 
   <Target Name="BeforeBuild">

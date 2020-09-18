@@ -9,7 +9,6 @@ release:
 
 release-deb:
 	sed -e "s|VERSION|$$VERSION|" ./Packaging/debian/DEBIAN/control.txt > ./Packaging/debian/DEBIAN/control
-	cat ./Packaging/debian/DEBIAN/control
 	dotnet publish Nanny.Console/Nanny.Console.csproj -c Release --self-contained -r ubuntu.20.04-x64 -o Packaging/debian/opt/kolenkainc/nanny
 	cp -R Packaging/debian $(FILENAME)
 	dpkg-deb --build $(FILENAME)
