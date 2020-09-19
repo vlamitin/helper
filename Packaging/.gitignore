@@ -1,0 +1,4 @@
+# Debian files
+debian/opt/kolenkainc/nanny/
+!debian/opt/kolenkainc/nanny/.gitkeep
+debian/DEBIAN/control
