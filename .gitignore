@@ -236,6 +236,7 @@ _Pvt_Extensions
 # Debian files
 Packaging/debian/opt/kolenkainc/nanny/
 !Packaging/debian/opt/kolenkainc/nanny/.gitkeep
+!Packaging/debian/usr/local/bin/
 nanny_*
 *.deb
 Packaging/debian/DEBIAN/control
