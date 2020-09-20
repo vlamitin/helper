@@ -2,7 +2,7 @@ using Nanny.Console.Commands;
 
 namespace Nanny.Console.Printers
 {
-    public abstract class Printer
+    public abstract class Printer : IPrinter
     {
         protected Command Command;
         
