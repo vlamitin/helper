@@ -25,17 +25,28 @@ namespace Nanny.Console
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .CreateLogger();
-            Log.Logger.Information("Application starting");
-            _host = Host.CreateDefaultBuilder()
-                .ConfigureServices((context, services) =>
-                {
-                    services.AddTransient<CommandList>(list => new CommandList {new VersionCommand(), new HelpCommand()});
-                    services.AddTransient<IPrinter, ConsolePrinter>();
-                })
-                .UseSerilog()
-                .Build();
+            try
+            {
+                Log.Logger.Information("Getting started...");
+                _host = Host.CreateDefaultBuilder()
+                    .ConfigureServices((context, services) =>
+                    {
+                        services.AddTransient<CommandList>();
+                        services.AddTransient<IPrinter, ConsolePrinter>();
+                    })
+                    .UseSerilog()
+                    .Build();
+            }
+            catch (Exception ex)
+            {
+                Log.Logger.Fatal(ex, "Host terminated unexpectedly");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
         }
-        
+
         static void Main(string[] args)
         {
             Program program = new Program();
