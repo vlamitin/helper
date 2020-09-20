@@ -15,8 +15,11 @@ namespace Nanny.Console
 
         public Program()
         {
-            var builder = new ConfigurationBuilder();
-            BuildConfig(builder);
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables();
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Build())
                 .Enrich.FromLogContext()
@@ -47,14 +50,6 @@ namespace Nanny.Console
                 list.Find(args, new HelpCommand())
                 )
                 .Print();
-        }
-
-        public static void BuildConfig(IConfigurationBuilder builder)
-        {
-            builder.SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables();
         }
     }
 }
