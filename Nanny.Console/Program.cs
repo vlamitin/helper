@@ -3,6 +3,7 @@ using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Nanny.Console.Commands;
 using Nanny.Console.Printers;
 using Serilog;
@@ -22,8 +23,6 @@ namespace Nanny.Console
                 .AddEnvironmentVariables();
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Build())
-                .Enrich.FromLogContext()
-                .WriteTo.Console()
                 .CreateLogger();
             try
             {
@@ -34,7 +33,11 @@ namespace Nanny.Console
                         services.AddTransient<CommandList>();
                         services.AddTransient<IPrinter, ConsolePrinter>();
                     })
-                    .UseSerilog()
+                    .ConfigureLogging(logging =>
+                    {
+                        logging.ClearProviders();
+                        logging.AddSerilog(Log.Logger);
+                    })
                     .Build();
             }
             catch (Exception ex)
