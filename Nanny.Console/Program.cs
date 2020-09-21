@@ -30,13 +30,13 @@ namespace Nanny.Console
                 _host = Host.CreateDefaultBuilder()
                     .ConfigureServices((context, services) =>
                     {
+                        services.AddLogging(l =>
+                        {
+                            l.ClearProviders();
+                            l.AddSerilog(Log.Logger);
+                        });
                         services.AddTransient<CommandList>();
                         services.AddTransient<IPrinter, ConsolePrinter>();
-                    })
-                    .ConfigureLogging(logging =>
-                    {
-                        logging.ClearProviders();
-                        logging.AddSerilog(Log.Logger);
                     })
                     .Build();
             }
